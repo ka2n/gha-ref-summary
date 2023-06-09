@@ -1,0 +1,35 @@
+name: Report
+
+on:
+  pull_request:
+    branches:
+      - "**"
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checktout
+        uses: actions/checkout@v3
+
+      - name: Output
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const task = require('./.github/scripts/report.js')
+            await task({
+              github,
+              context,
+              core,
+              result: {
+                github_ref: ['github.ref', '${{ github.ref }}'],
+                github_head_ref: ['github.head_ref', '${{ github.head_ref }}'],
+                github_base_ref: ['github.base_ref', '${{ github.base_ref }}'],
+                github_ref_or_head: ['github.head_ref || github.ref', '${{ github.head_ref || github.ref }}'],
+              }
+            })
